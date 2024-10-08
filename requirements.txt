@@ -1,0 +1,20 @@
+munkres=1.1.4
+networkx=3.3
+numpy=1.24.3
+scikit-learn=1.2.2=py311hcec6c5f_1
+scipy=1.10.1=py311hb23b6d4_0
+
+pytorch=2.2.2=py3.11_0
+torchaudio=2.2.2=py311_cpu
+torchvision=0.17.2=py311_cpu
+pyg==2.5.2=py311_torch_2.2.0_cpu
+
+# pytorch=2.2.2=py3.11_0
+# torchaudio=2.2.2=py311_cu118
+# torchvision=0.17.2=py311_cu118
+# pyg==2.5.2=py311_torch_2.2.0_cu118
+
+# pytorch=2.2.2=py3.11_0
+# torchaudio=2.2.2=py311_cu121
+# torchvision=0.17.2=py311_cu121
+# pyg==2.5.2=py311_torch_2.2.0_cu121
