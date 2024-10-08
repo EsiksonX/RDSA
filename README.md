@@ -1,12 +1,7 @@
 # RDSA
 This is the offical reponstory of Robust Deep Graph Clustering via Dual Soft Assignment
-
-## Datasets
-You can download full datasets via [OneDrive](https://1drv.ms/f/s!AvTtaNvOmbN3i_gl6xPHRB1z0xGVAg?e=2EDoMl) (Need VPN in some regions), and put them in the `data` folder.
-
 ## Model
 ![Model Framework](model.png)
-
 ## Requirements
 #### The code is tested under the following environment:
 - Python 3.11
@@ -26,7 +21,6 @@ conda activate rdsa
 # Comment out the CPU version and uncomment the GPU version in requirements.txt
 conda install --yes --file requirements.txt
 ```
-
 ## Run
 ### Cora
 Pre-training Auto-Encoder
