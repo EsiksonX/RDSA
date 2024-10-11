@@ -57,6 +57,7 @@ elif args.dataset == 'ogbn-arxiv':
     args.num_clusters = 40
     args.sigma = 0.5
     args.gcn_model = 'sage'
+    args.batch_size = 3200
 
 torch.manual_seed(args.seed)
 random.seed(args.seed)

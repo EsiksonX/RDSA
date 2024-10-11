@@ -5,7 +5,7 @@ import numpy as np
 from torch_geometric.data import Data, Dataset
 from sklearn.neighbors import kneighbors_graph
 
-from torch_geometric.datasets import Reddit, Planetoid, Amazon
+from torch_geometric.datasets import Planetoid, Amazon
 from torch_geometric.utils import to_dense_adj, dense_to_sparse
 from ogb.nodeproppred import PygNodePropPredDataset
 
@@ -23,8 +23,6 @@ def get_dataset(dataset_name, noise_level=0):
         dataset = Amazon('data', 'photo')
     elif dataset_name == 'ogbn-arxiv':
         dataset = PygNodePropPredDataset(name='ogbn-arxiv')
-    elif dataset_name == 'reddit':
-        dataset = Reddit(root='data/reddit')
     else:
         raise NotImplementedError(f'Dataset: {dataset_name} not implemented.')
     if noise_level > 0:

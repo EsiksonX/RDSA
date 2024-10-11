@@ -22,57 +22,20 @@ conda activate rdsa
 conda install --yes --file requirements.txt
 ```
 ## Run
-### Cora
-Pre-training Auto-Encoder
+We have included hyperparameters for different datasets in the `train.py` file. You can run the code using the following command:
+#### Pre-training Auto-Encoder
 ```
-python pretrain_ae.py --dataset cora --epochs 500 --device cuda
+python pretrain_ae.py --dataset <dataset_name> -- device cuda
 ```
-Train model
+#### Train model
 ```
-python train.py --dataset cora --sigma 0.5 --num_clusters 7 --gcn_model gcn --noise_level 0 --n_runs 5 --epochs 300 --device cuda
+python train.py --dataset <dataset_name> --noise_level 0 --n_runs 5 --device cuda
 ```
-### Citeseer
-Pre-training Auto-Encoder
+
+## Random Noise Generation
+The `add_noise_edge` method in `dataset.py` introduces noise to a graph by adding random edges between unconnected nodes that belong to different classes. It uses the specified noise level to determine the proportion of noise edges relative to the original graph structure, ensuring that the noise maintains inter-class connectivity and avoids linking nodes of the same class. The modified edge list reflects this added noise while preserving the graph’s overall structure.
+#### Usage
+Run the `main` method in `dataset.py` to generate a noisy graph or train the model with:
 ```
-python pretrain_ae.py --dataset citeseer --epochs 500 --device cuda
-```
-Train model
-```
-python train.py --dataset citeseer --sigma 0.5 --num_clusters 6 --gcn_model gcn --noise_level 0 --n_runs 5 --epochs 300 --device cuda
-```
-### PubMed
-Pre-training Auto-Encoder
-```
-python pretrain_ae.py --dataset pubmed --epochs 500 --device cuda
-```
-Train model
-```
-python train.py --dataset pubmed --sigma 0.5 --num_clusters 3 --gcn_model gcn --noise_level 0 --n_runs 5 --epochs 300 --device cuda
-```
-### Amazon Photo
-Pre-training Auto-Encoder
-```
-python pretrain_ae.py --dataset photo --epochs 500 --device cuda
-```
-Train model
-```
-python train.py --dataset photo --sigma 0.8 --num_clusters 8 --gcn_model gcn --noise_level 0 --n_runs 5 --epochs 300 --device cuda
-```
-### Amazon Computers
-Pre-training Auto-Encoder
-```
-python pretrain_ae.py --dataset computers --epochs 500 --device cuda
-```
-Train model
-```
-python train.py --dataset computers --sigma 0.4 --num_clusters 10 --gcn_model gcn --noise_level 0 --n_runs 5 --epochs 300 --device cuda
-```
-### ogbn arxiv
-Pre-training Auto-Encoder
-```
-python pretrain_ae.py --dataset ogbn-arxiv --epochs 500 --device cuda
-```
-Train model
-```
-python train.py --dataset ogbn-arxiv --sigma 0.5 --num_clusters 40 --gcn_model sage --batch_size 3200 --n_runs 5 --epochs 300 --device cuda
+python train.py --dataset <dataset_name> --noise_level <noise_level> --n_runs 5 --device cuda
 ```
