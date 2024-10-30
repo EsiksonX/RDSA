@@ -25,7 +25,7 @@ conda install --yes --file requirements.txt
 We have included hyperparameters for different datasets in the `train.py` file. You can run the code using the following command:
 #### Pre-training Auto-Encoder
 ```
-python pretrain_ae.py --dataset <dataset_name> -- device cuda
+python pretrain_ae.py --dataset <dataset_name> --device cuda
 ```
 #### Train model
 ```

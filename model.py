@@ -5,8 +5,6 @@ import torch.optim.lr_scheduler as lr_scheduler
 from torch_geometric.nn import SAGEConv, GCNConv
 from torch_geometric.utils import degree
 from torch_geometric.loader import NeighborSampler
-from dgl.nn.pytorch import SGConv
-import dgl
 
 from sklearn.cluster import KMeans
 import numpy as np
@@ -14,6 +12,8 @@ import numpy as np
 from utility import cluster_metrics
 
 import warnings
+
+from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
@@ -124,9 +124,9 @@ class SAGE(nn.Module):
         ae.load_state_dict(torch.load(f'pretrained/{data_name}_{ae_model}_state_dict.pt'))
 
         self.convs = torch.nn.ModuleList()
-        self.convs.append(SGConv(in_channels, 256))
-        self.convs.append(SGConv(256, 128))
-        self.convs.append(SGConv(128, out_channels))
+        self.convs.append(SAGEConv(in_channels, 256))
+        self.convs.append(SAGEConv(256, 128))
+        self.convs.append(SAGEConv(128, out_channels))
 
         self.encoder = torch.nn.ModuleList()
         self.encoder.append(ae.encoder1)
@@ -140,18 +140,18 @@ class SAGE(nn.Module):
 
         self.activation = nn.PReLU()
 
-    # def forward(self, x, adjs):
-    #     for i, (edge_index, _, size) in enumerate(adjs):
-    #         x_target = x[:size[1]]
-    #         g = self.convs[i]((x, x_target), edge_index)
-    #         z = self.encoder[i](x_target)
-    #         x = (1 - self.sigma) * g + self.sigma * z
-    #         if i != 2:
-    #             # x = F.relu(x)
-    #             # x = F.dropout(x, p=0.5, training=self.training)
-    #             x = self.activation(x)
-    #     x_hat = self.decoder(z)
-    #     return x_hat, z, soft_assignment1(x)
+    def forward(self, x, adjs):
+        for i, (edge_index, _, size) in enumerate(adjs):
+            x_target = x[:size[1]]
+            g = self.convs[i]((x, x_target), edge_index)
+            z = self.encoder[i](x_target)
+            x = (1 - self.sigma) * g + self.sigma * z
+            if i != 2:
+                # x = F.relu(x)
+                # x = F.dropout(x, p=0.5, training=self.training)
+                x = self.activation(x)
+        x_hat = self.decoder(z)
+        return x_hat, z, soft_assignment1(x)
 
 
 def reparameterization(mu, logvar):
@@ -301,23 +301,87 @@ def train_gcn(model, optimizer, dataset, device, epochs, ae_model, num_cluster):
     return metrics
 
 
+# def train_sage(model, optimizer, dataset, device, epochs, ae_model, num_cluster, batch_size):
+#     model.train()
+#     scheduler = lr_scheduler.LinearLR(optimizer, start_factor=1.0, end_factor=0.1, total_iters=epochs)
+#     data = dataset[0].to(device)
+#
+#     train_loader = NeighborSampler(data.edge_index, node_idx=None, sizes=[25, 10, 5], batch_size=batch_size, shuffle=True,
+#                                    num_workers=4)
+#
+#     for epoch in range(epochs):
+#         total_loss = 0
+#         g_ = []
+#
+#         progress_bar = tqdm(train_loader, desc=f"Epoch [{epoch + 1}/{epochs}]", leave=False)
+#
+#         for batch_size, n_id, adjs in train_loader:
+#             adjs = [adj.to(device) for adj in adjs]
+#
+#             # get sub graph
+#             target_nodes = n_id[:batch_size]
+#             edge_index = adjs[0].edge_index
+#             src, dst = edge_index
+#             mask = (src < batch_size) & (dst < batch_size)
+#             target_edge_index = edge_index[:, mask]
+#             num_target_edge_index = target_edge_index.shape[1]
+#             target_degree = torch.bincount(target_edge_index.flatten(), minlength=batch_size)
+#             target_label = data.y[target_nodes].flatten()
+#             target_pseudo_label = F.one_hot(target_label, num_classes=num_cluster).float()
+#
+#             optimizer.zero_grad()
+#
+#             x, z, g = model(data.x[n_id], adjs)
+#             g_.append(g.detach().cpu().numpy())
+#             a_loss = ae_loss(data.x[target_nodes], x, ae_model)
+#
+#             m_loss = modularity_loss(g, num_target_edge_index, target_edge_index, target_degree, target_pseudo_label)
+#
+#             if epoch > 0:
+#                 ass2 = soft_assignment2(g, landmarks)
+#                 kl_loss = F.kl_div(ass2.log(), target_distribution(ass2))
+#                 loss = a_loss + m_loss + kl_loss
+#             else:
+#                 loss = a_loss + m_loss
+#             loss.backward()
+#             total_loss += loss.item()
+#
+#             torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+#             optimizer.step()
+#             scheduler.step()
+#
+#         kmeans = KMeans(n_clusters=num_cluster).fit(np.vstack(g_))
+#         landmarks = torch.tensor(kmeans.cluster_centers_).to(device)
+#
+#
+#         loss = total_loss / len(train_loader)
+#         print(
+#             f'Epoch [{epoch}/{epochs}]\t Loss: {loss:.4f}')
+
 def train_sage(model, optimizer, dataset, device, epochs, ae_model, num_cluster, batch_size):
     model.train()
     scheduler = lr_scheduler.LinearLR(optimizer, start_factor=1.0, end_factor=0.1, total_iters=epochs)
     data = dataset[0].to(device)
 
-    train_loader = NeighborSampler(data.edge_index, node_idx=None, sizes=[25, 10, 5], batch_size=batch_size, shuffle=True,
-                                   num_workers=4)
+    train_loader = NeighborSampler(
+        data.edge_index, node_idx=None, sizes=[25, 10, 5], batch_size=batch_size,
+        shuffle=True, num_workers=4
+    )
+
+    landmarks = None  # Initialize landmarks for the first epoch
 
     for epoch in range(epochs):
         total_loss = 0
         g_ = []
-        for batch_size, n_id, adjs in train_loader:
-            adjs = [adj.to(device) for adj in adjs]
 
-            # get sub graph
+        # Create a progress bar for the current epoch's batches
+        progress_bar = tqdm(train_loader, desc=f"Epoch [{epoch + 1}/{epochs}]", leave=False)
+
+        for batch_size, n_id, adjs in progress_bar:
+            adjs = [adj.to(device) for adj in adjs]
             target_nodes = n_id[:batch_size]
             edge_index = adjs[0].edge_index
+
             src, dst = edge_index
             mask = (src < batch_size) & (dst < batch_size)
             target_edge_index = edge_index[:, mask]
@@ -331,7 +395,6 @@ def train_sage(model, optimizer, dataset, device, epochs, ae_model, num_cluster,
             x, z, g = model(data.x[n_id], adjs)
             g_.append(g.detach().cpu().numpy())
             a_loss = ae_loss(data.x[target_nodes], x, ae_model)
-
             m_loss = modularity_loss(g, num_target_edge_index, target_edge_index, target_degree, target_pseudo_label)
 
             if epoch > 0:
@@ -340,20 +403,25 @@ def train_sage(model, optimizer, dataset, device, epochs, ae_model, num_cluster,
                 loss = a_loss + m_loss + kl_loss
             else:
                 loss = a_loss + m_loss
+
             loss.backward()
             total_loss += loss.item()
 
+            # Clip gradients to prevent explosion
             torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
             optimizer.step()
             scheduler.step()
 
+            # Update progress bar with the current batch's loss
+            progress_bar.set_postfix(loss=loss.item())
+
+        # Compute k-means and update landmarks at the end of the epoch
         kmeans = KMeans(n_clusters=num_cluster).fit(np.vstack(g_))
         landmarks = torch.tensor(kmeans.cluster_centers_).to(device)
 
-
-        loss = total_loss / len(train_loader)
-        print(
-            f'Epoch [{epoch}/{epochs}]\t Loss: {loss:.4f}')
+        # Print average loss for the epoch
+        avg_loss = total_loss / len(train_loader)
+        print(f'Epoch [{epoch + 1}/{epochs}] Loss: {avg_loss:.4f}')
 
 
 def test_gcn(model, dataset, device, ae_model):

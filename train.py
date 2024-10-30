@@ -12,7 +12,7 @@ import argparse
 
 
 args = argparse.ArgumentParser(description='GNN Training')
-args.add_argument('--dataset', type=str, default='computers', help='Name of the dataset')
+args.add_argument('--dataset', type=str, default='cora', help='Name of the dataset')
 args.add_argument('--out_channels', type=int, default=16, help='Number of output channels')
 args.add_argument('--ae_model', type=str, default='ae', help='Base model to use')
 args.add_argument('--gcn_model', type=str, default='gcn', help='Base model to use')
@@ -58,6 +58,13 @@ elif args.dataset == 'ogbn-arxiv':
     args.sigma = 0.5
     args.gcn_model = 'sage'
     args.batch_size = 3200
+
+elif args.dataset == 'ogbn-products':
+    args.num_clusters = 47
+    args.sigma = 0.5
+    args.gcn_model = 'sage'
+    args.batch_size = 3200
+
 
 torch.manual_seed(args.seed)
 random.seed(args.seed)

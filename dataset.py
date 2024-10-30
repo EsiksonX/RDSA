@@ -23,6 +23,8 @@ def get_dataset(dataset_name, noise_level=0):
         dataset = Amazon('data', 'photo')
     elif dataset_name == 'ogbn-arxiv':
         dataset = PygNodePropPredDataset(name='ogbn-arxiv')
+    elif dataset_name == 'ogbn-products':
+        dataset = PygNodePropPredDataset(name='ogbn-products')
     else:
         raise NotImplementedError(f'Dataset: {dataset_name} not implemented.')
     if noise_level > 0:
