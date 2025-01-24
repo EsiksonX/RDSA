@@ -21,7 +21,7 @@ args.add_argument('--epochs', type=int, default=300, help='Number of epochs')
 args.add_argument('--device', type=str, default='cuda', help='Device to train on')
 args.add_argument('--seed', type=int, default=45, help='Random seed')
 args.add_argument('--num_clusters', type=int, default=3, help='Number of clusters')
-args.add_argument('--noise_level', type=int, default=3, help='Noise level')
+args.add_argument('--noise_level', type=int, default=0, help='Noise level')
 args.add_argument('--n_runs', type=int, default=3, help='Number of runs')
 args.add_argument("--batch_size", type=int, default=1600, help="Batch size for training")
 
