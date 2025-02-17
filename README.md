@@ -1,5 +1,5 @@
 # RDSA
-This is the official repository of the DASFAA 2025 paper RDSA: A Robust Deep Graph Clustering Framework via Dual Soft Assignment. The complete version of paper can be viewed on [ArXiV](https://arxiv.org/abs/2410.21745)
+This is the official repository of the DASFAA 2025 paper ***RDSA: A Robust Deep Graph Clustering Framework via Dual Soft Assignment***. The complete version of the paper with full experiment results can be viewed on [ArXiv](https://arxiv.org/abs/2410.21745).
 ## Model
 ![Model Framework](model.png)
 ## Requirements
