@@ -39,3 +39,13 @@ Run the `main` method in `dataset.py` to generate a noisy graph or train the mod
 ```
 python train.py --dataset <dataset_name> --noise_level <noise_level> --n_runs 5 --device cuda
 ```
+
+#### Citation
+```
+@inproceedings{yang2025rdsa,
+  title={RDSA: A Robust Deep Graph Clustering Framework via Dual Soft Assignment},
+  author={Xiang, Yang and Fan, Li and Tulika, Saha and Pang, Xiaoying and Pan, Yushan and Zhang, Haiyang and Ji, Chengtao},
+  booktitle={Proceedings of The 30th International Conference on Database Systems for Advanced Applications (DASFAA 2025)},
+  year={2025}
+}
+```
