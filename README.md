@@ -1,5 +1,5 @@
 # RDSA
-This is the official repository of the DASFAA 2025 paper ***RDSA: A Robust Deep Graph Clustering Framework via Dual Soft Assignment***. The complete version of the paper with full experiment results can be viewed on [ArXiv](https://arxiv.org/abs/2410.21745).
+This is the official repository of the DASFAA 2025 paper [***RDSA: A Robust Deep Graph Clustering Framework via Dual Soft Assignment***](https://doi.org/10.1007/978-981-95-3906-2_16).
 ## Model
 ![Model Framework](model.png)
 ## Requirements
@@ -33,7 +33,7 @@ python train.py --dataset <dataset_name> --noise_level 0 --n_runs 5 --device cud
 ```
 
 ## Random Noise Generation
-The `add_noise_edge` method in `dataset.py` introduces noise to a graph by adding random edges between unconnected nodes that belong to different classes. It uses the specified noise level to determine the proportion of noise edges relative to the original graph structure, ensuring that the noise maintains inter-class connectivity and avoids linking nodes of the same class. The modified edge list reflects this added noise while preserving the graph’s overall structure.
+The `add_noise_edge` method in `dataset.py` introduces noise to a graph by adding random edges between unconnected nodes that belong to different classes. It uses the specified noise level to determine the proportion of noise edges relative to the original graph structure, ensuring that the noise maintains inter-class connectivity while avoiding links between nodes of the same class. The modified edge list reflects this added noise while preserving the graph’s overall structure.
 #### Usage
 Run the `main` method in `dataset.py` to generate a noisy graph or train the model with:
 ```
@@ -45,7 +45,11 @@ python train.py --dataset <dataset_name> --noise_level <noise_level> --n_runs 5 
 @inproceedings{yang2025rdsa,
   title={RDSA: A Robust Deep Graph Clustering Framework via Dual Soft Assignment},
   author={Xiang, Yang and Fan, Li and Tulika, Saha and Pang, Xiaoying and Pan, Yushan and Zhang, Haiyang and Ji, Chengtao},
-  booktitle={Proceedings of The 30th International Conference on Database Systems for Advanced Applications (DASFAA 2025)},
-  year={2025}
+  booktitle="Database Systems for Advanced Applications",
+  year="2026",
+  publisher="Springer Nature Singapore",
+  address="Singapore",
+  pages="253--263",
+  isbn="978-981-95-3906-2"
 }
 ```
